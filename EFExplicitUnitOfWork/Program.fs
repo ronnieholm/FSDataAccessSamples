@@ -1,7 +1,10 @@
 ﻿namespace EFExplicitUnitOfWork
 
+// http://blogs.msdn.com/b/visualstudio/archive/2011/04/04/f-code-first-development-with-entity-framework-4-1.aspx
+
 open System
 open System.Data.Entity
+open System.Linq
 
 [<AutoOpen>]
 module Constants = 
@@ -54,7 +57,8 @@ module Program =
         db.ActorsMovies.Add am |> ignore 
 
         db.SaveChanges() |> ignore
+
+        let a' = db.Actors.First(fun a -> a.Name = "Sylvester Stallone")
+        a'.Name <- "Sylvester Stallone II"
+        db.SaveChanges() |> ignore
         0
-
-
-
