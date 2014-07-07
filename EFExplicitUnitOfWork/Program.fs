@@ -27,6 +27,7 @@ type ActorsMovies() =
     member val Actor = null with get, set
     member val Movie = null with get, set
 
+// EF UoW
 type public Db() =
     inherit DbContext(ConnectionString)
 
@@ -42,6 +43,7 @@ type public Db() =
     val mutable private _actorsMovies : DbSet<ActorsMovies>
     member public x.ActorsMovies with get() = x._actorsMovies and set v = x._actorsMovies <- v    
 
+// custom UoW
 type UnitOfWork() =
     let db = new Db()
 
