@@ -42,9 +42,35 @@ type public Db() =
     val mutable private _actorsMovies : DbSet<ActorsMovies>
     member public x.ActorsMovies with get() = x._actorsMovies and set v = x._actorsMovies <- v    
 
+type UnitOfWork() =
+    let db = new Db()
+
+    // for querying we could define Get methods that return List<T> such that
+    // the client is persistence ignorant. But that's a lot of extra work with
+    // little actual benefit. We accept the leaking abstraction and expose the
+    // DbSet<T> for querying to take advantage of the LINQ methods even though
+    // it makes it difficult to fake the database in tests.
+    member x.Actors = db.Actors
+    member x.Movies = db.Movies
+    member x.ActorsMovies = db.ActorsMovies
+
+    // makes the syntax for working with EF UoW nicer
+    member x.Add a = db.Actors.Add a |> ignore
+    member x.Add m = db.Movies.Add m |> ignore
+    member x.Add am = db.ActorsMovies.Add am |> ignore
+    member x.Remove a = db.Actors.Remove a |> ignore
+    member x.Remove m = db.Movies.Remove m |> ignore
+    member x.Remove am = db.ActorsMovies.Remove am |> ignore    
+    member x.SaveChanges() = db.SaveChanges() |> ignore 
+
+    interface IDisposable with
+        member x.Dispose() =
+            db.Dispose()
+
 module Program =
     [<EntryPoint>]
     let main args =
+        // with EF provided Unit of Work
         use db = new Db()
 
         let a = Actor(Name = "Sylvester Stallone", Born = DateTime(1946, 7, 6))
@@ -61,4 +87,15 @@ module Program =
         let a' = db.Actors.First(fun a -> a.Name = "Sylvester Stallone")
         a'.Name <- "Sylvester Stallone II"
         db.SaveChanges() |> ignore
+        
+        // with custom Unit of Work wrapping EF Unit of Work
+        use uow = new UnitOfWork()
+        uow.Add a
+        uow.Add m
+        uow.Add am
+
+        let a' = uow.Actors.First(fun a -> a.Name = "Sylvester Stallone")
+        a'.Name <- "Sylvester Stallone III"
+        uow.SaveChanges()
+
         0
