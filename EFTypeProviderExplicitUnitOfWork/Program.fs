@@ -1,5 +1,8 @@
 ﻿namespace EFTypeProviderExplicitUnitOfWork
 
+// Walkthrough: Accessing a SQL Database by Using Type Providers and Entities (F#)
+// http://msdn.microsoft.com/en-us/library/hh361035%28v=VS.110%29.aspx
+
 open System
 open System.Data.Linq
 open System.Data.Entity
