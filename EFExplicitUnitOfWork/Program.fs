@@ -57,12 +57,12 @@ type UnitOfWork() =
     member __.ActorsMovies = db.ActorsMovies
 
     // makes the syntax for working with EF UoW nicer
-    member __.Add a = db.Actors.Add a |> ignore
-    member __.Add m = db.Movies.Add m |> ignore
-    member __.Add am = db.ActorsMovies.Add am |> ignore
-    member __.Remove a = db.Actors.Remove a |> ignore
-    member __.Remove m = db.Movies.Remove m |> ignore
-    member __.Remove am = db.ActorsMovies.Remove am |> ignore    
+    member __.AddActor a = db.Actors.Add a |> ignore
+    member __.AddMovie m = db.Movies.Add m |> ignore
+    member __.AddActorsMovie am = db.ActorsMovies.Add am |> ignore
+    member __.RemoveActor a = db.Actors.Remove a |> ignore
+    member __.RemoveMovie m = db.Movies.Remove m |> ignore
+    member __.RemoveActorsMovie am = db.ActorsMovies.Remove am |> ignore    
     member __.SaveChanges() = db.SaveChanges() |> ignore 
 
     interface IDisposable with
@@ -92,9 +92,9 @@ module Program =
         
         // with custom Unit of Work wrapping EF Unit of Work
         use uow = new UnitOfWork()
-        uow.Add a
-        uow.Add m
-        uow.Add am
+        uow.AddActor a
+        uow.AddMovie m
+        uow.AddActorsMovie am
 
         let a' = uow.Actors.First(fun a -> a.Name = "Sylvester Stallone")
         a'.Name <- "Sylvester Stallone III"
