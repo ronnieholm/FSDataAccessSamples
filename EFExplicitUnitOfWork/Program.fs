@@ -52,21 +52,21 @@ type UnitOfWork() =
     // little actual benefit. We accept the leaking abstraction and expose the
     // DbSet<T> for querying to take advantage of the LINQ methods even though
     // it makes it difficult to fake the database in tests.
-    member x.Actors = db.Actors
-    member x.Movies = db.Movies
-    member x.ActorsMovies = db.ActorsMovies
+    member __.Actors = db.Actors
+    member __.Movies = db.Movies
+    member __.ActorsMovies = db.ActorsMovies
 
     // makes the syntax for working with EF UoW nicer
-    member x.Add a = db.Actors.Add a |> ignore
-    member x.Add m = db.Movies.Add m |> ignore
-    member x.Add am = db.ActorsMovies.Add am |> ignore
-    member x.Remove a = db.Actors.Remove a |> ignore
-    member x.Remove m = db.Movies.Remove m |> ignore
-    member x.Remove am = db.ActorsMovies.Remove am |> ignore    
-    member x.SaveChanges() = db.SaveChanges() |> ignore 
+    member __.Add a = db.Actors.Add a |> ignore
+    member __.Add m = db.Movies.Add m |> ignore
+    member __.Add am = db.ActorsMovies.Add am |> ignore
+    member __.Remove a = db.Actors.Remove a |> ignore
+    member __.Remove m = db.Movies.Remove m |> ignore
+    member __.Remove am = db.ActorsMovies.Remove am |> ignore    
+    member __.SaveChanges() = db.SaveChanges() |> ignore 
 
     interface IDisposable with
-        member x.Dispose() =
+        member __.Dispose() =
             db.Dispose()
 
 module Program =
