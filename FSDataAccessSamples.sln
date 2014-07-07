@@ -9,6 +9,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AdoNetExplicitUnitOfWork", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "EFExplicitUnitOfWork", "EFExplicitUnitOfWork\EFExplicitUnitOfWork.fsproj", "{EEEEF2C3-4270-4B59-BD97-F69D8381761B}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "EFTypeProviderExplicitUnitOfWork", "EFTypeProviderExplicitUnitOfWork\EFTypeProviderExplicitUnitOfWork.fsproj", "{AB3C6384-A119-4E31-9939-76C61F521B73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{EEEEF2C3-4270-4B59-BD97-F69D8381761B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEEEF2C3-4270-4B59-BD97-F69D8381761B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEEEF2C3-4270-4B59-BD97-F69D8381761B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB3C6384-A119-4E31-9939-76C61F521B73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3C6384-A119-4E31-9939-76C61F521B73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3C6384-A119-4E31-9939-76C61F521B73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3C6384-A119-4E31-9939-76C61F521B73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
