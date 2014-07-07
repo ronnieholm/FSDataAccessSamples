@@ -28,7 +28,7 @@ type ActorsMovies() =
     member val Movie = null with get, set
 
 // EF UoW
-type public Db() =
+type Db() =
     inherit DbContext(ConnectionString)
 
     [<DefaultValue>]
