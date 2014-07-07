@@ -62,7 +62,7 @@ type UnitOfWork() =
     member __.AddActorsMovie am = db.ActorsMovies.Add am |> ignore
     member __.RemoveActor a = db.Actors.Remove a |> ignore
     member __.RemoveMovie m = db.Movies.Remove m |> ignore
-    member __.RemoveActorsMovie am = db.ActorsMovies.Remove am |> ignore    
+    member __.RemoveActorsMovies am = db.ActorsMovies.Remove am |> ignore    
     member __.SaveChanges() = db.SaveChanges() |> ignore 
 
     interface IDisposable with
