@@ -1,6 +1,6 @@
-﻿This sample shows a couple of repositories implemented using low-level ADO.NET 
-classes that share an SqlConnection/SqlTransaction and thus provides a crude 
-implementation of the Unit of Work pattern.
+﻿This sample shows three repositories implemented using low-level ADO.NET. 
+The repositories share an SqlConnection/SqlTransaction and thus provides 
+a crude implementation of an implicit Unit of Work pattern.
 
 Before running the sample, create the following LocalDb:
 
@@ -25,4 +25,3 @@ Before running the sample, create the following LocalDb:
         CONSTRAINT [FK_ActorsMovies_Actors] FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actors] ([Id]),
         CONSTRAINT [FK_ActorsMovies_Movies] FOREIGN KEY ([MovieId]) REFERENCES [dbo].[Movies] ([Id])
     );
-

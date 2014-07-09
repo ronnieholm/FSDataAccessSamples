@@ -1,6 +1,6 @@
 ﻿This sample shows an explit implementation of the Unit of Work pattern, making
 use of ADO.NET classes and repositories underneath. Looking at the Unit of
-Work class, notice how it starts to resemble the ObjectContext (derived class) 
+Work class, notice how it starts to resemble the DbContext (derived class) 
 from Entity Framework.
 
 Before running the sample, create the following LocalDb:

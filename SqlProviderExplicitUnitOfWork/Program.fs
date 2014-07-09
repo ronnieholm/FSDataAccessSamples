@@ -32,11 +32,7 @@ module Program =
         // primary key, e.g., using guids
         let am = ctx.``[dbo].[ActorsMovies]``.Create()
         
-        // properties cannot be set
-        // am.FK_ActorsMovies_Actors <- a
-        // am.FK_ActorsMovies_Movies <- m
-
-        // what to set the Ids to?       
+        // what to set the Ids to?   
         //am.Actor_Id <- a.Id
         //am.Movie_Id <- a.Id
 

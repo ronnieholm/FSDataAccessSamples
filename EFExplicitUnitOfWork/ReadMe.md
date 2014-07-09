@@ -1,8 +1,10 @@
-﻿This sample shows an explit implementation of the Unit of Work pattern via
-Entity Framework. To isolate the application from knowing about the ORM
-used, we wrap the Entity Framework Object Context Unit of Work in our own.
+﻿This sample shows an explicit implementation of the Unit of Work pattern via
+Entity Framework. To make the F# code more idiomatic, we wrap the Entity 
+Framework DbContext Unit of Work in our own.
 
-Before running the sample, create the following LocalDb:
+Before running the sample, create the following LocalDb. Since we aren't using
+Entity Framework code-first, we need to alter the foreign keys to conform
+to the framework convention over configuration naming schema (ActorId -> Actor_Id):
 
     CREATE TABLE [dbo].[Actors] (
         [Id]   INT            IDENTITY (1, 1) NOT NULL,

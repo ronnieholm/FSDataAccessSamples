@@ -26,7 +26,7 @@ module Program =
         let m = EntityConnection.ServiceTypes.Movie(Title = "Rambo")
         uow.Movies.AddObject m
 
-        // manually specifying the singular of ActorsMovies isn't possible without the
+        // manually specifying singular form of ActorsMovies isn't possible without the
         // use of a local schema file. Also the insertion fails with an exception
         // stating that metadata information is missing for the
         // SqlEntityConnection1.FK_ActorsMovies_Actors relation.

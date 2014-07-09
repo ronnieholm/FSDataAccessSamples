@@ -1,10 +1,7 @@
 ﻿namespace AdoNetExplicitUnitOfWork
 
-// Persistence Patterns
-// http://msdn.microsoft.com/en-us/magazine/dd569757.aspx
-
-// The Unit Of Work Pattern And Persistence Ignorance
-// http://msdn.microsoft.com/en-us/magazine/dd882510.aspx
+// Repositories On Top UnitOfWork Are Not a Good Idea
+// http://www.wekeroad.com/2014/03/04/repositories-and-unitofwork-are-not-a-good-idea
 
 open System
 open System.Data
@@ -16,7 +13,6 @@ open System.Data.SqlClient
 module Constants = 
     let ConnectionString = "Data Source=(localdb)\Projects;Initial Catalog=AdoNetExplicitUnitOfWork;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False"
 
-// domain
 type Actor = 
     { Id: Guid
       Name: string
@@ -41,11 +37,11 @@ type Entity =
 module Helpers =
     let setParam (cmd: SqlCommand) name value = cmd.Parameters.AddWithValue(name, value) |> ignore
 
-// Similar to the Entity Framework ObjectContext class
-// See the description of Unit of Work pattern in Fowler's 
+// Similar to the Entity Framework DbContext class.
+// See description of Unit of Work pattern in Fowler's 
 // Patterns of Enterprise Application Architecture, page 184
 
-// for testing the domain, we could have UnitOfWork implement
+// for testing the domain, we could've UnitOfWork implement
 // an interface that we'd then implement in the test to
 // work against an in-memory database
 type UnitOfWork() =
@@ -91,7 +87,7 @@ type UnitOfWork() =
         updated.Add e
 
     member x.Add e =
-        // no need to assert that id has been set as it's enforced through record type
+        // no need to assert that id has been set as it's enforced through use of record type
         if updated.Contains e then failwith "Can't add existing object as new"
         if deleted.Contains e then failwith "Can't add deleted object as new"
         if added.Contains e then failwith "Can't add the same object more than once"
@@ -104,7 +100,7 @@ type UnitOfWork() =
         if not (deleted.Contains e) then deleted.Add e
         x.RemoveFromIdentityMap e
 
-    // repositories serving the same purpose as DbSet in an EF ObjectContext derived class
+    // repositories serving the same purpose as DbSet<T> in an EF DbContext derived class
     member x.Actors = ActorRepository x
     member x.Movies = MovieRepository x
     member x.ActorsMovies = ActorsMoviesRepository x
@@ -114,7 +110,7 @@ type UnitOfWork() =
         con.Open()
         let trans = con.BeginTransaction()
 
-        // we could iterate throgh the entire identity map to detect
+        // we could iterate the entire identity map to detect
         // inconsistent reads and fail the transaction, but in most
         // cases it suffices to check for inconsistencies of data modified,
         // i.e., as part of update and delete (or a subset of the identity
@@ -165,12 +161,12 @@ and ActorRepository(uow) =
         if actors.Count() = 1 then Some (Actor (actors |> List.head))
         else None
 
-    // having an Sql builder available would simplify get methods on different
+    // having an SQL builder available would simplify get methods on different
     // criteria. That's what EF and LINQ gives us, i.e., a single DbSet<T> to
-    // form queries without the need for individual and repetitive get methods
+    // form queries over without the need for individual and repetitive get methods
     member x.GetById id =
-        // if we where to fetch related object beware of n + 1 problem, We'd
-        // need a way to definere which sub-objects to include and cycle-detection
+        // if we where to fetch related object beware of n + 1 problem. We'd
+        // need a way to definere which objects to include and do cycle-detection
         match uow.GetFromIdentityMap id with
         | Some a -> Some a
         | None ->
@@ -186,7 +182,7 @@ and ActorRepository(uow) =
                 Some a
             else None
   
-    // could be moved to seperate data mapper class together
+    // could be moved to seperate data mapper class
     member __.Create a (mkCmd: string -> SqlCommand) =
         use cmd = mkCmd "insert into Actors (Id, Name, Born) values (@id, @name, @born)"
         setParam cmd "@id" a.Id
@@ -297,8 +293,8 @@ and ActorsMoviesRepository(uow) =
             else None
 
     member __.GetByActorId id =
-        // method doesn't return a single item by primary key id
-        // so we can't look in identity map directly
+        // this method doesn't return a single item by primary key
+        // so we can't look for it in the identity map
         use con = new SqlConnection(ConnectionString)
         con.Open()
         use cmd = new SqlCommand("select * from ActorsMovies where ActorId = @id", con)

@@ -6,12 +6,13 @@
 // The Unit Of Work Pattern And Persistence Ignorance
 // http://msdn.microsoft.com/en-us/magazine/dd882510.aspx
 
+// todo: use scope_identity() over @@identity
+
 open System
 open System.Linq
 open System.Collections.Generic
 open System.Data.SqlClient
 
-// domain
 type Actor = 
     { Id: int
       Name: string
@@ -35,7 +36,7 @@ module Extensions =
 type Repository(con: SqlConnection, trans: SqlTransaction) =
     member __.MkCmd sql = new SqlCommand(sql, con, trans)
 
-// notice how repetitive the task of implementing each repository is
+// creating each repository is a very repetitive task
 type ActorRepository(con: SqlConnection, trans: SqlTransaction) =
     inherit Repository(con, trans)
 
