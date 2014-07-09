@@ -29,7 +29,7 @@ module Program =
         m.Title <- "Rambo"
 
         // setting up the relationship isn't possible unless we control the 
-        // primary key, e.g., using guids?
+        // primary key, e.g., using guids
         let am = ctx.``[dbo].[ActorsMovies]``.Create()
         
         // properties cannot be set

@@ -31,6 +31,7 @@ type ActorsMovies() =
 type Db() =
     inherit DbContext(ConnectionString)
 
+    // we don't want to reimplement LINQ and hide these behind repositories
     [<DefaultValue>]
     val mutable private _actors : DbSet<Actor>
     member public x.Actors with get() = x._actors and set v = x._actors <- v
@@ -56,7 +57,8 @@ type UnitOfWork() =
     member __.Movies = db.Movies
     member __.ActorsMovies = db.ActorsMovies
 
-    // makes the syntax for working with EF UoW nicer
+    // makes the syntax for working with EF UoW nicer (polymormic add and
+    // remove methods are possible but better be explicit to avoid bugs)
     member __.AddActor a = db.Actors.Add a |> ignore
     member __.AddMovie m = db.Movies.Add m |> ignore
     member __.AddActorsMovie am = db.ActorsMovies.Add am |> ignore
