@@ -24,6 +24,6 @@ to the framework convention over configuration naming schema (ActorId -> Actor_I
         [Actor_Id] INT NOT NULL,
         [Movie_Id] INT NOT NULL,
         PRIMARY KEY CLUSTERED ([Id] ASC),
-        CONSTRAINT [FK_ActorsMovies_Actors] FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actors] ([Id]),
-        CONSTRAINT [FK_ActorsMovies_Movies] FOREIGN KEY ([MovieId]) REFERENCES [dbo].[Movies] ([Id])
+        CONSTRAINT [FK_ActorsMovies_Actors] FOREIGN KEY ([Actor_Id]) REFERENCES [dbo].[Actors] ([Id]),
+        CONSTRAINT [FK_ActorsMovies_Movies] FOREIGN KEY ([Movie_Id]) REFERENCES [dbo].[Movies] ([Id])
     );

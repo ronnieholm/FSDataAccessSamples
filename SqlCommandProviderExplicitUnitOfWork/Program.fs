@@ -140,9 +140,9 @@ module Program =
                 | Some id -> id
                 | None -> failwith "Actor not inserted"
 
-        let rocky =  { Id = 0; Title = "Rambo" }
+        let rambo =  { Id = 0; Title = "Rambo" }
         let mId = 
-            uow.Movies.Create rocky
+            uow.Movies.Create rambo
             |> function
                 | Some id -> id
                 | None -> failwith "Movie not inserted"
