@@ -38,70 +38,30 @@ module Queries =
 
     let toOption n = if n = 0 then None else Some n
 
-// instead of creating classes with data annotations, a more functional style
-// would be to prevent the creation of an object with an invalid state in the 
-// first place using railway oriented programming.
-
-// compared to regular classes record types have build-in immutability,
-// equality and comparison
-type Actor =
-    { Id: int
-      Name: string
-      Born: DateTime }
-
-type Movie = 
-    { Id: int
-      Title: string }
-
-type ActorMovie =
-    { Id: int
-      ActorId: int
-      MovieId: int }
-
+// we're creating an abstraction (repository) of an abstraction (SqlClient) here.
+// Use SqlClient directly for querying and skip the repository and use transaction 
+// object for updating
 type ActorRepository(t: SqlTransaction) =
-    member __.GetById id = 
-        (new ActorById()).Execute(id) 
-        |> function
-            | Some a -> Some { Id = a.Id; Name = a.Name; Born = a.Born }
-            | None -> None
-
-    member __.Create a = (new CreateActor(t)).Execute(name = a.Name, born = a.Born) |> Option.get
-    member __.Update (a: Actor) = (new UpdateActor(t)).Execute(id = a.Id, name = a.Name, born = a.Born) |> toOption
-    member __.Delete a = (new DeleteActor(t)).Execute(a.Id) |> toOption
+    member __.GetById id = (new ActorById()).Execute(id)
+    member __.Create (a: ActorById.Record) = (new CreateActor(t)).Execute(name = a.Name, born = a.Born) |> Option.get
+    member __.Update (a: ActorById.Record) = (new UpdateActor(t)).Execute(id = a.Id, name = a.Name, born = a.Born) |> toOption
+    member __.Delete (a: ActorById.Record) = (new DeleteActor(t)).Execute(a.Id) |> toOption
 
 type MovieRepository(t: SqlTransaction) =
-    member __.GetById id = 
-        (new MovieById()).Execute(id) 
-        |> function
-            | Some m -> Some { Id = m.Id; Title = m.Title }
-            | None -> None
-
-    member __.Create m = (new CreateMovie(t)).Execute(title = m.Title) |> Option.get
-    member __.Update (m: Movie) = (new UpdateMovie(t)).Execute(id = m.Id, title = m.Title) |> toOption
-    member __.Delete m = (new DeleteMovie(t)).Execute(m.Id) |> toOption
+    member __.GetById id = (new MovieById()).Execute(id) 
+    member __.Create (m: MovieById.Record) = (new CreateMovie(t)).Execute(title = m.Title) |> Option.get
+    member __.Update (m: MovieById.Record) = (new UpdateMovie(t)).Execute(id = m.Id, title = m.Title) |> toOption
+    member __.Delete (m: MovieById.Record) = (new DeleteMovie(t)).Execute(m.Id) |> toOption
 
 // what to do when a query method doesn't fit into a specific repository?
 // Create a query object CQRS-style
 type ActorMovieRepository(t: SqlTransaction) =
-    member __.GetById id =
-        (new ActorMovieById(t)).Execute(id) 
-        |> function
-            | Some am -> Some { Id = am.Id; ActorId = am.Actor_Id; MovieId = am.Movie_Id }
-            | None -> None
-
-    member __.GetByActorId id =
-        (new ActorMovieByActorId(t)).Execute(id) 
-        |> Seq.map (fun r -> { Id = r.Id; ActorId = r.Actor_Id; MovieId = r.Movie_Id })
-        |> Seq.toList
-
-    member __.GetByMovieId id =
-        (new ActorMovieByMovieId(t)).Execute(id) 
-        |> Seq.map (fun x -> { Id = x.Id; ActorId = x.Actor_Id; MovieId = x.Movie_Id }) 
-        |> Seq.toList   
-
-    member __.Create am = (new CreateActorMovie(t)).Execute(actorId = am.ActorId, movieId = am.MovieId) |> Option.get
-    member __.Update (am: ActorMovie) = (new UpdateActorMovie(t)).Execute(id = am.Id, actorId = am.ActorId, movieId = am.MovieId) |> toOption
-    member __.Delete am = (new DeleteActorMovie(t)).Execute(am.Id) |> toOption
+    member __.GetById id = (new ActorMovieById(t)).Execute(id) 
+    member __.GetByActorId id = (new ActorMovieByActorId(t)).Execute(id) |> Seq.toList
+    member __.GetByMovieId id = (new ActorMovieByMovieId(t)).Execute(id) |> Seq.toList   
+    member __.Create (am: ActorMovieById.Record) = (new CreateActorMovie(t)).Execute(actorId = am.Actor_Id, movieId = am.Movie_Id) |> Option.get
+    member __.Update (am: ActorMovieById.Record) = (new UpdateActorMovie(t)).Execute(id = am.Id, actorId = am.Actor_Id, movieId = am.Movie_Id) |> toOption
+    member __.Delete (am: ActorMovieById.Record) = (new DeleteActorMovie(t)).Execute(am.Id) |> toOption
 
 type UnitOfWork() =
     // watch out for transaction isolation level: we don't want to 
@@ -133,21 +93,21 @@ module Program =
     [<EntryPoint>]
     let main args =
         use uow = new UnitOfWork()
-        let stallone = { Id = 0; Name = "Sylvester Stallone"; Born = DateTime(1946, 7, 6) }
+        let stallone =  ActorById.Record(id = 0, name = "", born = DateTime(1946, 7, 6))
         let aId = 
             uow.Actors.Create stallone
             |> function
                 | Some id -> id
                 | None -> failwith "Actor not inserted"
 
-        let rambo =  { Id = 0; Title = "Rambo" }
+        let rambo = MovieById.Record(id = 0, title = "Rambo")
         let mId = 
             uow.Movies.Create rambo
             |> function
                 | Some id -> id
                 | None -> failwith "Movie not inserted"
 
-        let stalloneRambo = { Id = 0; ActorId = aId; MovieId = mId }
+        let stalloneRambo = ActorMovieById.Record(id = 0, actor_Id = aId, movie_Id = mId)
         let amId = 
             uow.ActorsMovies.Create stalloneRambo
             |> function
