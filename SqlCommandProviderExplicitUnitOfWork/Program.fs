@@ -108,6 +108,8 @@ type CreateActorMovieCommand(a: ActorById.Record, m: MovieById.Record) =
     member __.Execute() =
         (new CreateActorMovie()).Execute(actorId = a.Id, movieId = m.Id) |> Option.get
 
+// add query types for complex queries used in multiple places in a real world app
+
 module Program =
     [<EntryPoint>]
     let main args =
