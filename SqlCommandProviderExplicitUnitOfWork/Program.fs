@@ -38,6 +38,8 @@ module Queries =
 
     let toOption n = if n = 0 then None else Some n
 
+// Take 1 -- sub-optimal
+
 // we're creating an abstraction (repository) of an abstraction (SqlClient) here.
 // Use SqlClient directly for querying and skip the repository and use transaction 
 // object for updating
@@ -89,11 +91,29 @@ type UnitOfWork() =
         member __.Dispose() =
             con.Dispose()
 
+// Take 2 -- better
+
+// every command is an isolated unit so we don't pass in a transaction. 
+// Instead each command would do its work in its own transaction.
+// Real world commands would be more complex.
+type CreateActorCommand(a: ActorById.Record) =
+    member __.Execute() =
+        (new CreateActor()).Execute(name = a.Name, born = a.Born) |> Option.get
+
+type CreateMovieCommand(m: MovieById.Record) =
+    member __.Execute() =
+        (new CreateMovie()).Execute(title = m.Title) |> Option.get
+
+type CreateActorMovieCommand(a: ActorById.Record, m: MovieById.Record) =
+    member __.Execute() =
+        (new CreateActorMovie()).Execute(actorId = a.Id, movieId = m.Id) |> Option.get
+
 module Program =
     [<EntryPoint>]
     let main args =
+        // take 1
         use uow = new UnitOfWork()
-        let stallone =  ActorById.Record(id = 0, name = "", born = DateTime(1946, 7, 6))
+        let stallone =  ActorById.Record(id = 0, name = "Sylvester Stallone", born = DateTime(1946, 7, 6))
         let aId = 
             uow.Actors.Create stallone
             |> function
@@ -115,4 +135,26 @@ module Program =
                 | None -> failwith "ActorMovie not inserted"
 
         uow.Commit()
+
+        // take 2
+        let aId = 
+            CreateActorCommand(ActorById.Record(id = 0, name = "Sly", born = DateTime(1946, 7, 6))).Execute()
+            |> function
+                | Some id -> id
+                | None -> failwith "Actor not inserted"
+
+        let mId = 
+            CreateMovieCommand(MovieById.Record(id = 0, title = "Rambo II")).Execute()
+            |> function
+                | Some id -> id
+                | None -> failwith "Movie not inserted"
+        
+        let a = (new ActorById()).Execute(aId) |> Option.get
+        let m = (new MovieById()).Execute(mId) |> Option.get
+        let amId = 
+            CreateActorMovieCommand(a, m).Execute()
+            |> function
+                | Some id -> id
+                | None -> failwith "ActorMovie not inserted"
+
         0
