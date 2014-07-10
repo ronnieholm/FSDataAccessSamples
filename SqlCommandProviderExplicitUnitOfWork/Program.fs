@@ -41,8 +41,8 @@ module Queries =
 // Take 1 -- sub-optimal
 
 // we're creating an abstraction (repository) of an abstraction (SqlClient) here.
-// Use SqlClient directly for querying and skip the repository and use transaction 
-// object for updating
+// Skip the repository and use SqlClient directly for querying and use transaction 
+// object for updating.
 type ActorRepository(t: SqlTransaction) =
     member __.GetById id = (new ActorById()).Execute(id)
     member __.Create (a: ActorById.Record) = (new CreateActor(t)).Execute(name = a.Name, born = a.Born) |> Option.get
