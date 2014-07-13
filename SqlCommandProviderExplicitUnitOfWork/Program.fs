@@ -9,6 +9,8 @@
 // Favor query objects over repositories
 // http://lostechies.com/jimmybogard/2012/10/08/favor-query-objects-over-repositories/
 
+// todo: use Choice type instead of Some to convey information about error to caller
+
 open System
 open System.Data.SqlClient
 open FSharp.Data
